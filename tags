@@ -1,0 +1,46 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+Fs	sin_cos.py	/^Fs = 10000.0;  # sampling rate$/;"	v
+N	negative_frequency.py	/^N     = 128;$/;"	v
+T	negative_frequency.py	/^T     = arange(0,N-1,1)$/;"	v
+Ts	sin_cos.py	/^Ts = 1.0\/Fs; # sampling interval$/;"	v
+arange	negative_frequency.py	/^from scipy import fft, arange$/;"	i
+arange	sin_cos.py	/^from scipy import fft, arange$/;"	i
+cos	negative_frequency.py	/^from numpy import sin, linspace, pi, cos$/;"	i
+cos	sin_cos.py	/^from numpy import sin, linspace, pi, cos$/;"	i
+f0MHz	negative_frequency.py	/^f0MHz = 5;$/;"	v
+ff	sin_cos.py	/^ff = 100;   # frequency of the signal$/;"	v
+fft	negative_frequency.py	/^from scipy import fft, arange$/;"	i
+fft	sin_cos.py	/^from scipy import fft, arange$/;"	i
+fsMHz	negative_frequency.py	/^fsMHz = 20;$/;"	v
+linspace	negative_frequency.py	/^from numpy import sin, linspace, pi, cos$/;"	i
+linspace	sin_cos.py	/^from numpy import sin, linspace, pi, cos$/;"	i
+pi	negative_frequency.py	/^from numpy import sin, linspace, pi, cos$/;"	i
+pi	sin_cos.py	/^from numpy import sin, linspace, pi, cos$/;"	i
+plot	negative_frequency.py	/^from pylab import plot, show, title, xlabel, ylabel, subplot$/;"	i
+plot	sin_cos.py	/^from pylab import plot, show, title, xlabel, ylabel, subplot$/;"	i
+plotSpectrum	sin_cos.py	/^def plotSpectrum(y,Fs):$/;"	f	access:public
+show	negative_frequency.py	/^from pylab import plot, show, title, xlabel, ylabel, subplot$/;"	i
+show	sin_cos.py	/^from pylab import plot, show, title, xlabel, ylabel, subplot$/;"	i
+showdata	sin_cos.py	/^showdata=[0,32,-1,-130,0,291,-1,-512,0,778,-1,-1078,0,1391,-1,-1702,0,1988,-1,-2234,0,2420,0,-2539,0,2578,0,-2539,0,2420,0,-2234,-1,1988,0,-1702,-1,1391,0,-1078,-1,778,0,-512,-1,291,0,-130,-1,32,0]$/;"	v
+sin	negative_frequency.py	/^from numpy import sin, linspace, pi, cos$/;"	i
+sin	sin_cos.py	/^from numpy import sin, linspace, pi, cos$/;"	i
+subplot	negative_frequency.py	/^from pylab import plot, show, title, xlabel, ylabel, subplot$/;"	i
+subplot	sin_cos.py	/^from pylab import plot, show, title, xlabel, ylabel, subplot$/;"	i
+t	sin_cos.py	/^t = arange(0,1,Ts) # time vector$/;"	v
+title	negative_frequency.py	/^from pylab import plot, show, title, xlabel, ylabel, subplot$/;"	i
+title	sin_cos.py	/^from pylab import plot, show, title, xlabel, ylabel, subplot$/;"	i
+x	sin_cos.py	/^x = (0.2*cos(2*pi*2*t)+0.4) * y$/;"	v
+xComplex	negative_frequency.py	/^xComplex = exp(1j*2*pi*f0MHz*T\/fsMHz);$/;"	v
+xComplexF	negative_frequency.py	/^xComplexF = (1.\/N)*fft(xComplex,N); $/;"	v
+xReal	negative_frequency.py	/^xReal    = cos(2*pi*f0MHz*T.\/fsMHz);$/;"	v
+xRealF	negative_frequency.py	/^xRealF   = (1.\/N)*fft(xReal,N); $/;"	v
+xlabel	negative_frequency.py	/^from pylab import plot, show, title, xlabel, ylabel, subplot$/;"	i
+xlabel	sin_cos.py	/^from pylab import plot, show, title, xlabel, ylabel, subplot$/;"	i
+y	sin_cos.py	/^y = sin(2*pi*ff*t)$/;"	v
+ylabel	negative_frequency.py	/^from pylab import plot, show, title, xlabel, ylabel, subplot$/;"	i
+ylabel	sin_cos.py	/^from pylab import plot, show, title, xlabel, ylabel, subplot$/;"	i
