@@ -41,14 +41,17 @@ grid on
 axis([-fsMHz/2 fsMHz/2 0 1.2])
 
 f=fopen('matlabout.txt','wt');
-fprintf(f,'xReal\n');
-fprintf(f,'\t%+.8e + %+.8ei \n',[real(xReal) imag(xReal)]);
-fprintf(f,'\nxComplex\n');
-fprintf(f,'\t%+.8e\t\t\t%+.8ei \n',real(xComplex),imag(xComplex));
-fprintf(f,'xRealF\n');
-fprintf(f,'\t%+.8e\t\t\t%+.8ei \n',real(xRealF),imag(xRealF));
-fprintf(f,'\nxComplexF\n');
-fprintf(f,'\t%+.8e\t\t\t%+.8ei \n',real(xComplexF),imag(xComplexF));
+fprintf(f,'xReal:\n');
+%for n=1:N
+	%fprintf(f,'\t%+.8e + %+.8ei \n',real(xReal(n)),imag(xReal(n)));
+%end
+fprintf(f,'\t%+.8e %+.8ei \n',[real(xReal);imag(xReal)]);
+fprintf(f,'\nxComplex:\n');
+fprintf(f,'\t%+.8e %+.8ei \n',[real(xComplex);imag(xComplex)]);
+fprintf(f,'\nxRealF:\n');
+fprintf(f,'\t%+.8e %+.8ei \n',[real(xRealF);imag(xRealF)]);
+fprintf(f,'\nxComplexF:\n');
+fprintf(f,'\t%+.8e %+.8ei \n',[real(xComplexF);imag(xComplexF)]);
 fclose(f);
 
 

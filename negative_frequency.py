@@ -11,8 +11,8 @@ MyPi  = 3.1416
 xReal    = cos(2.0*MyPi*f0MHz*T/fsMHz);
 xComplex = exp(1j*2.0*MyPi*f0MHz*T/fsMHz);
 
-xRealF   = (1.0/N)*rfft(xReal,N); 
-xComplexF = (1.0/N)*rfft(xComplex,N); 
+xRealF   = (1.0/N)*fft(xReal,N); 
+xComplexF = (1.0/N)*fft(xComplex,N); 
 
 Tplot = arange(-N/2.0,N/2.0,1)
 #print xReal
@@ -29,12 +29,16 @@ Tplot = arange(-N/2.0,N/2.0,1)
 #show()
 
 f=open('output.txt','w')
-f.write('\nxReal:\n')
-f.write(str(xReal))
+f.write('xReal:\n')
+for number in xReal:
+	f.write(('\t{0.real:+.8e} {0.imag:+.8e}i\n').format(number))
 f.write('\nxComplex:\n')
-f.write(str(xComplex))
+for number in xComplex:
+	f.write(('\t{0.real:+.8e} {0.imag:+.8e}i\n').format(number))
 f.write('\nxRealF:\n')
-f.write(str(xRealF))
+for number in xRealF:
+	f.write(('\t{0.real:+.8e} {0.imag:+.8e}i\n').format(number))
 f.write('\nxComplexF:\n')
-f.write(str(xComplexF))
+for number in xComplexF:
+	f.write(('\t{0.real:+.8e} {0.imag:+.8e}i\n').format(number))
 f.close()
