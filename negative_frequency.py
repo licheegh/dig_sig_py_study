@@ -15,18 +15,11 @@ xRealF   = (1.0/N)*fft(xReal,N);
 xComplexF = (1.0/N)*fft(xComplex,N); 
 
 Tplot = arange(-N/2.0,N/2.0,1)
-#print xReal
-#print xComplex
-#print
-#print xRealF
-#print xComplexF
-#print Tplot
-#print T
-#subplot(2,1,1)
-#plot(Tplot*fsMHz/N,(fftshift(abs(xRealF))));
-#subplot(2,1,2)
-#plot(Tplot*fsMHz/N,(fftshift(abs(xComplexF))));
-#show()
+subplot(2,1,1)
+plot(Tplot*fsMHz/N,(fftshift(abs(xRealF))));
+subplot(2,1,2)
+plot(Tplot*fsMHz/N,(fftshift(abs(xComplexF))));
+show()
 
 f=open('output.txt','w')
 f.write('xReal:\n')
