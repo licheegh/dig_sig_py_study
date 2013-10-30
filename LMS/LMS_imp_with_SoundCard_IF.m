@@ -1,0 +1,90 @@
+clear all;
+close all;
+ai = analoginput('winsound');
+addchannel(ai,1:2);
+Fs = 44100;
+duration = 2;
+sample_length = 192;
+set (ai, 'SampleRate', Fs);
+set (ai, 'SamplesPerTrigger', duration*Fs);
+start(ai);
+filter_length=96;
+mu = 200/32768;            % LMS step size.
+error_state = zeros(1);
+coeffs = zeros(1,filter_length);
+stats=zeros(1,filter_length);
+data = double(getdata(ai,'native'))/23768;
+%ha = adaptfilt.dlms(filter_length,mu,1,1,error_state,coeffs,stats);
+ha = adaptfilt.dlms(filter_length,mu,1,1);
+set(ha,'PersistentMemory',true);
+data_out=zeros(1);
+for i=1:(duration*Fs/sample_length-1)
+    left=data(i*sample_length:(i+1)*sample_length,1);
+    right = data(i*sample_length:(i+1)*sample_length,2);
+    %data(:,1) left data(:,2) right
+    [y,e] = filter(ha,right,left); %xn : desired n: input. y:output e:err output 
+    %plot(ha.coefficients);%hold on;
+    %plot(e,'r');hold off;
+    %freqz(ha);
+    temp=[data_out;e];
+    data_out=temp(:);
+end
+delete(ai);
+clear ai
+
+e_int=int16(e*32768);
+data_out_int=int16(data_out*32768);
+right_int=int16(right*32768);
+left_int=int16(left*32768);
+
+Num_Point = length(e_int)-1;
+size=length(e_int);
+subplot(2,1,1); 
+plot(e_int(size-Num_Point:size),'r');hold on;
+plot(left_int(size-Num_Point:size),'k');
+legend('filter out','signal+noise(left)');
+title('Signal Out&In last sample');
+subplot(2,1,2);
+plot(left_int(size-Num_Point:size),'b');hold on;
+plot(right_int(size-Num_Point:size),'r');
+legend('signal+noise(left)','noise(right)');
+title('Signal In last sample');
+
+left=data(:,1);right=data(:,2);
+right_int=int16(right*32768);
+left_int=int16(left*32768);
+N = 4096;
+Num_Point = 10000;
+data_out_fft = (1.0/N)*fft(double(data_out_int(length(data_out_int)-Num_Point:length(data_out_int))),N); 
+left_fft = (1.0/N)*fft(double(left_int(length(left_int)-Num_Point:length(left_int))),N); 
+right_fft = (1.0/N)*fft(double(right_int(length(right_int)-Num_Point:length(right_int))),N); 
+
+data_out_fft_abs = abs(data_out_fft);
+left_fft_abs = abs(left_fft);
+right_fft_abs = abs(right_fft);
+
+figure;
+hold on;
+subplot(2,1,1);
+plot(mag2db(data_out_fft_abs(1:numel(data_out_fft_abs)/2+1)),'k');
+legend('filter output');
+title('Filter Out FFT in dB');
+subplot(2,1,2);
+hold on;
+plot(mag2db(left_fft_abs(1:numel(left_fft_abs)/2+1)),'r');
+plot(mag2db(right_fft_abs(1:numel(right_fft_abs)/2+1)),'b');
+legend('signal+noise(left)','noise(right)');
+title('Original Signal FFT in dB');
+
+figure;
+hold on;
+subplot(2,1,1);
+plot((data_out_fft_abs(1:numel(data_out_fft_abs)/2+1)),'k');
+legend('filter output');
+title('Filter Out FFT in Mag');
+subplot(2,1,2);
+hold on;
+plot((left_fft_abs(1:numel(left_fft_abs)/2+1)),'r');
+plot((right_fft_abs(1:numel(right_fft_abs)/2+1)),'b');
+legend('signal+noise(left)','noise(right)');
+title('Original Signal FFT in Mag');

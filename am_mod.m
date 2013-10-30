@@ -3,15 +3,15 @@
 clear all
 close all
 
-fcarr	= 3.0
-finput	= 0.5
-finput	= 4.0
-bw = 0.01
-fs		= 0.1
-fsmod	= 20.0
-N     = 4096
-MyPi  = pi
-ModRatio = 0.5
+fcarr	= 3.0;
+finput	= 0.5;
+finput	= 4.0;
+bw = 0.01;
+fs		= 0.1;
+fsmod	= 20.0;
+N     = 4096;
+MyPi  = pi;
+ModRatio = 0.5;
 bwnoise = rand(size([0:N-1])).*bw - bw/2 + (ones(size([0:N-1])));
 bwnoise =1;
 
@@ -29,8 +29,8 @@ figure;
 hold on
 %plot([-N/2:N/2-1]*fsmod/N,(fftshift(abs(xInputF))),'g');
 %plot([-N/2:N/2-1]*fsmod/N,(fftshift(abs(xCarrierF))),'r');
-plot([-N/2:N/2-1]*fsmod/N,(fftshift(abs(xModF))),'b');
-plot([-N/2:N/2-1]*fsmod/N,((xModrF)),'y');
+plot((-N/2:N/2-1)*fsmod/N,(fftshift(abs(xModF))),'b');
+plot((-N/2:N/2-1)*fsmod/N,((xModF)),'y');
 % xlabel('frequency, MHz')
 % ylabel('amplitude')
 % title('frequency response of real and complex sinusoidal signal'); 

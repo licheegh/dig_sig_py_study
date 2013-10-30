@@ -2,7 +2,6 @@ x  = randn(1,500);     % Input to the filter
 b  = fir1(31,0.5);     % FIR system to be identified
 n  = 0.1*randn(1,500); % Observation noise signal
 d  = filter(b,1,x)+n;  % Desired signal
-d  = filter(b,1,x);  % Desired signal
 mu = 0.008;            % LMS step size.
 ha = adaptfilt.lms(32,mu);
 [y,e] = filter(ha,x,d);

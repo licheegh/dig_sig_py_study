@@ -3,21 +3,22 @@ close all
 ratio = 3;
 size = 10000;
 f0MHz = 2; % signal frequency
-fN1MHz = 0.1;
-fN2MHz = 4;
+fN1MHz = 0.5;
+fN2MHz = 8;
 fsMHz = 20; % sampling frequency
-Noise_Level =1;
+Noise_Level = 1;
 x = cos(2*pi*f0MHz*[0:size-1]/fsMHz);
 n1  = Noise_Level*randn(1,size); % Observation noise signal
 ratio = 10;
 n2  = Noise_Level*cos(2*pi*fN1MHz*[0:size-1]/fsMHz);
 ratio = 5;
 n3  = Noise_Level*cos(2*pi*fN2MHz*[0:size-1]/fsMHz);
-n = n1+n2+n3;
+n = n2+n3+n1;
 xn = x+n; % signal + noise
-mu = 0.0008;            % LMS step size.
-ha = adaptfilt.lms(128,mu);
-[y,e] = filter(ha,n,xn);
+mu = 0.0002;            % LMS step size.
+ha = adaptfilt.dlms(128,mu,1,1);
+%ha = adaptfilt.nlms(64,mu,1,50);
+[y,e] = filter(ha,n,xn); %xn : desired n: input. y:? e:output 
 
 Num_Point = 100;
 subplot(2,1,1); plot(size-Num_Point:size,[e(size-Num_Point:size)],'k');
