@@ -6,26 +6,25 @@ from scipy import arange
 from numpy import pi
 from pylab import cos
 
-freq = 300.0
-sam_rate=6000.0
-N     = 6000
+freq = 1.0
+sam_rate=44100.0
+N     = 4096
 T     = arange(0.0,float(N),1.0)
 xArray = cos(2.0*pi*freq*T/sam_rate) * 256
 xArray.astype(int)
 
-#chunk = 1024
+chunk = 1024
 
-#wf = wave.open(r"c:\WINDOWS\Media\ding.wav", 'rb')
+wf = wave.open(r"c:\WINDOWS\Media\ding.wav", 'rb')
 
 p = pyaudio.PyAudio()
 
 # open stream
-#channel = wf.getnchannels()
+channel = wf.getnchannels()
 channel = 1
-#rates = wf.getframerate()
-rates = int(sam_rate)
-#format1 = p.get_format_from_width(wf.getsampwidth())
-format1 = 8 #this means 16bit int?
+rates = wf.getframerate()
+rates = sam_rate
+format1 = p.get_format_from_width(wf.getsampwidth())
 
 stream = p.open(format = format1,
                 channels=channel,
@@ -33,11 +32,8 @@ stream = p.open(format = format1,
                 output = True)
 
 # write stream to play
-phase = 0
 while True:
-    #data = wf.readframes(chunk)
-    xArray = cos(2.0*pi*freq*T/sam_rate + phase) * 2048
-    data = xArray.astype(int)
+    data = wf.readframes(chunk)
     if data == "": break
     stream.write(data)
 
