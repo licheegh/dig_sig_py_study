@@ -1,54 +1,49 @@
 # -*- coding: utf-8 -*-
 import pyaudio
-import wave
-import time
+from time import sleep
 from struct import *
+from math import pi,sin
 
-from scipy import arange
-from numpy import pi
-from pylab import cos,sin
-from matplotlib import pyplot
+class GenSin:
+    def __init__(self):
+        self.sample_rate=44100
+        self.frequence=100
+        self.amplitude=32000
+        self.time_lst=range(0,self.sample_rate/self.frequence,1)
+        self.phase=0
+        self.data_generated = 0
+        self.offset=0
+        self.data_str=""
+        self.data_lst=[]
+    def GetData(self,data_length):
+        if self.data_generated == 0:
+            if data_length > self.sample_rate/self.frequence:
+                self.num_copy = data_length/(self.sample_rate/self.frequence) + 1
+            else:
+                self.num_copy = 1
+            for j in range(self.num_copy):
+                for i in self.time_lst:
+                    tempf=sin(2.0*pi*float(self.frequence)*float(i)/float(self.sample_rate) + float(self.phase)) * float(self.amplitude)
+                    self.data_lst.append(int(tempf))
+                    self.data_str = self.data_str + pack('h',int(tempf))
+            self.data_generated = 1
 
-freq = 100
-sam_rate=44100
-N     = 44100
-T     = range(0,sam_rate/freq,1)
-Amp   = 32000
-Sample_Len = 5
+        data=self.data_str[self.offset:data_length+self.offset]
+        self.offset = (data_length+self.offset)%(self.sample_rate/self.frequence*2)
+        return data
 
+gensin=GenSin()
 p = pyaudio.PyAudio()
-fig1 = pyplot.figure()
 
 channel = 1
-rates = int(sam_rate)
-format1 = pyaudio.paInt16
-
-phase = pi/2
-phase = 0
-counter = 2
-xArray = ""
-datalst = []
-
-for j in range(Sample_Len):
-    for i in T:
-        tempf=sin(2.0*pi*float(freq)*float(i)/float(sam_rate) + float(phase)) * float(Amp)
-        datalst.append(int(tempf))
-        #print int(tempf)
-        xArray = xArray + pack('h',int(tempf))
-#print unpack('hhh',xArray[0:6])
-print "calc finished"
-print len(xArray)
-#pyplot.plot(datalst)
-#pyplot.show()
+rates = int(gensin.sample_rate)
+audio_format = pyaudio.paInt16
 
 def callback(in_data, frame_count, time_info, status):
-    data=xArray[callback.offset:frame_count*2+callback.offset]
-    callback.offset = (frame_count*2+callback.offset)%(sam_rate/freq*2)
+    data = gensin.GetData(frame_count*2)
     return (data, pyaudio.paContinue)
 
-callback.offset = 0
-
-stream = p.open(format = format1,
+stream = p.open(format = audio_format,
                 channels=channel,
                 rate=rates,
                 output = True,
@@ -57,17 +52,7 @@ stream = p.open(format = format1,
 stream.start_stream()
 
 while stream.is_active():
-    time.sleep(0.01)
-
-#while True:
-    ##data = wf.readframes(chunk)
-    #stream.write(data)
-    ##xArray = cos(2.0*pi*freq*T/sam_rate + phase) * Amp
-    ##data = xArray.astype(int)
-    #counter = counter - 1
-    #if counter == 0: break
-    ##pyplot.plot(data)
-    ##pyplot.show()
+    sleep(0.1)
 
 stream.stop_stream()
 stream.close()
