@@ -120,6 +120,29 @@ class BaseRtlSdr(object):
 
         return center_freq
 
+    def set_freq_correction(self, err_ppm):
+        ''' Set frequency offset of tuner (in PPM). '''
+
+        freq = int(err_ppm)
+
+        result = librtlsdr.rtlsdr_set_freq_correction(self.dev_p, err_ppm)
+        if result < 0:
+            self.close()
+            raise IOError('Error code %d when setting freq. offset to %d ppm'\
+                          % (result, err_ppm))
+
+        return
+
+    def get_freq_correction(self):
+        ''' Get frequency offset of tuner (in PPM). '''
+
+        result = librtlsdr.rtlsdr_get_freq_correction(self.dev_p)
+        if result < 0:
+            self.close()
+            raise IOError('Error code %d when getting freq. offset in ppm.'\
+                          % (result))
+        return
+
     def set_sample_rate(self, rate):
         ''' Set sample rate of tuner (in Hz).
         Use get_sample_rate() to see the precise sample rate used. '''
@@ -130,7 +153,7 @@ class BaseRtlSdr(object):
         if result < 0:
             self.close()
             raise IOError('Error code %d when setting sample rate to %d Hz'\
-                          % (result, freq))
+                          % (result, rate))
 
         return
 
@@ -217,6 +240,54 @@ class BaseRtlSdr(object):
 
         return
 
+    def set_agc_mode(self, enabled):
+        ''' Enable RTL2832 AGC
+        '''
+        result = librtlsdr.rtlsdr_set_agc_mode(self.dev_p, int(enabled))
+        if result < 0:
+            raise IOError('Error code %d when setting AGC mode'\
+                          % (result))
+
+        return result
+
+    def set_direct_sampling(self, direct):
+        ''' Enable direct sampling.
+        direct -- sampling mode
+        If direct is False or 0, disable direct sampling
+        If direct is 'i' or 1, use ADC I input
+        If direct is 'q' or 2, use ADC Q input
+        '''
+
+        # convert parameter
+        if isinstance(direct, str):
+            if direct.lower() == 'i':
+                direct = 1
+            elif direct.lower() == 'q':
+                direct = 2
+            else:
+                raise SyntaxError('invalid value "%s"' % direct)
+
+        # make sure False works as an option
+        if not direct:
+            direct = 0
+
+        result = librtlsdr.rtlsdr_set_direct_sampling(self.dev_p, direct)
+        if result < 0:
+            raise IOError('Error code %d when setting AGC mode'\
+                          % (result))
+
+        return result
+
+    def get_tuner_type(self):
+        ''' Get the tuner type.
+        '''
+        result = librtlsdr.rtlsdr_get_tuner_type(self.dev_p)
+        if result < 0:
+            raise IOError('Error code %d when getting tuner type'\
+                          % (result))
+
+        return result
+
     def read_bytes(self, num_bytes=DEFAULT_READ_SIZE):
         ''' Read specified number of bytes from tuner. Does not attempt to unpack
         complex samples (see read_samples()), and data may be unsafe as buffer is
@@ -276,6 +347,7 @@ class BaseRtlSdr(object):
     center_freq = fc = property(get_center_freq, set_center_freq)
     sample_rate = rs = property(get_sample_rate, set_sample_rate)
     gain = property(get_gain, set_gain)
+    freq_correction = property(get_freq_correction, set_freq_correction)
 
 
 # This adds async read support to base class BaseRtlSdr (don't use that one)

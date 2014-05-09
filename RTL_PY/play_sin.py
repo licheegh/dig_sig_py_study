@@ -7,7 +7,7 @@ from math import pi,sin
 class GenSin:
     def __init__(self):
         self.sample_rate=44100
-        self.frequence=100
+        self.frequence=400
         self.amplitude=32000
         self.time_lst=range(0,self.sample_rate/self.frequence,1)
         self.phase=0
