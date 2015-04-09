@@ -8,7 +8,6 @@ Created on Tue Mar 24 10:48:07 2015
 import pyaudio
 import tkinter as tk
 import wave
-from time import sleep
 import threading
 import queue
 import matplotlib.pyplot as plt
@@ -18,11 +17,19 @@ import numpy as np
 from scipy import fftpack
 from scipy import signal
 
-def calculate():
-    global counter
-    counter=-1
-    print('change')
+CHUNK = 1024
+FORMAT = pyaudio.paInt16
+CHANNELS = 1
+RATE = 44100
+RECORD_SECONDS = 5
+WAVE_OUTPUT_FILENAME = "output.wav"
+data =[]
+Recording=False
+FFT_LEN = 128
+frames=[]
+counter=1
 
+#GUI
 class Application(tk.Frame):
     def __init__(self,master=None):
         tk.Frame.__init__(self,master)
@@ -34,19 +41,8 @@ class Application(tk.Frame):
         self.quitButton=tk.Button(self,text='quit',command=root.destroy)
         self.quitButton.grid(column=1,row=3)
 
-        self.funButton=tk.Button(self,text='calculate',command=calculate)
-        self.funButton.grid(column=2,row=2)
 
-CHUNK = 1024
-FORMAT = pyaudio.paInt16
-CHANNELS = 1
-RATE = 44100
-RECORD_SECONDS = 5
-WAVE_OUTPUT_FILENAME = "output.wav"
-data =[]
-Recording=False
-FFT_LEN = 128
-
+#Matplotlib
 fig = plt.figure()
 rt_ax = plt.subplot(212,xlim=(0,CHUNK), ylim=(-10000,10000))
 fft_ax = plt.subplot(211)
@@ -79,17 +75,6 @@ def plot_update(i):
     fft_line.set_ydata(fft_data)
     return fft_line,rt_line,
 
-#def fft_plot_init():
-    #fft_ax.add_line(fft_line)
-    #return fft_line,
-    
-#def fft_plot_update(i):
-    #global fft_data
-    
-    #fft_line.set_xdata(x_data)
-    #fft_line.set_ydata(fft_data)
-    #return fft_line,
-
 
 ani = animation.FuncAnimation(fig, plot_update,
                               init_func=plot_init, 
@@ -98,10 +83,10 @@ ani = animation.FuncAnimation(fig, plot_update,
                               blit=True)
 
 
+# pyaudio
 p = pyaudio.PyAudio()
 q = queue.Queue()
 
-# define callback (2)
 def audio_callback(in_data, frame_count, time_info, status):
     global data    
     q.put(in_data)
@@ -114,7 +99,6 @@ def audio_callback(in_data, frame_count, time_info, status):
         return (None,pyaudio.paContinue)
 
 
-# open stream using callback (3)
 stream = p.open(format=FORMAT,
         channels=CHANNELS,
         rate=RATE,
@@ -130,12 +114,10 @@ if Recording:
     wf.setsampwidth(p.get_sample_size(FORMAT))
     wf.setframerate(RATE)
 
-print("* recording")
+print("Start Recording")
 stream.start_stream()
 
-frames=[]
-counter=1
-
+#processing block
 
 window = signal.hamming(CHUNK)
 
@@ -179,3 +161,4 @@ print("* done recording")
 if Recording:
     wf.writeframes(b''.join(frames))
     wf.close()
+
