@@ -30,6 +30,5 @@ def update(i):
 ani = animation.FuncAnimation(fig, update,
                               init_func=init, 
                               frames=1,
-                              interval=1,
+                              interval=30,
                               blit=True)
-plt.show()

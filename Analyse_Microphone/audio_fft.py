@@ -16,6 +16,7 @@ import matplotlib.animation as animation
 import matplotlib.lines as line
 import numpy as np
 from scipy import fftpack
+from scipy import signal
 
 def calculate():
     global counter
@@ -44,10 +45,14 @@ RECORD_SECONDS = 5
 WAVE_OUTPUT_FILENAME = "output.wav"
 data =[]
 Recording=False
+FFT_LEN = 128
 
 fig = plt.figure()
 rt_ax = plt.subplot(212,xlim=(0,CHUNK), ylim=(-10000,10000))
-fft_ax = plt.subplot(211,xlim=(0,CHUNK/2 + 1), ylim=(0,100000))
+fft_ax = plt.subplot(211)
+fft_ax.set_yscale('log')
+fft_ax.set_xlim(0,CHUNK/2 + 1)
+fft_ax.set_ylim(1,100000000)
 rt_ax.set_title("Real Time")
 fft_ax.set_title("FFT Time")
 rt_line = line.Line2D([],[])
@@ -132,6 +137,8 @@ frames=[]
 counter=1
 
 
+window = signal.hamming(CHUNK)
+
 def read_audio_thead(q,stream,frames,ad_rdy_ev):
     global rt_data
     global fft_data
@@ -141,8 +148,11 @@ def read_audio_thead(q,stream,frames,ad_rdy_ev):
         if not q.empty():
             #process audio data here
             data=q.get()
+            while not q.empty():
+                q.get()
             rt_data = np.frombuffer(data,np.dtype('<i2'))
-            fft_temp_data=fftpack.fft(rt_data,rt_data.size)
+            rt_data = rt_data * window
+            fft_temp_data=fftpack.fft(rt_data,rt_data.size,overwrite_x=True)
             fft_data=np.abs(fft_temp_data)[0:fft_temp_data.size/2+1]
             if Recording :
                 frames.append(data)
