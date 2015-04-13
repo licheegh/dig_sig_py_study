@@ -36,7 +36,6 @@ class Application(tk.Frame):
         self.grid()
         self.creatWidgets()
 
-
     def creatWidgets(self):
         self.quitButton=tk.Button(self,text='quit',command=root.destroy)
         self.quitButton.grid(column=1,row=3)
@@ -88,10 +87,9 @@ p = pyaudio.PyAudio()
 q = queue.Queue()
 
 def audio_callback(in_data, frame_count, time_info, status):
-    global data    
-    q.put(in_data)
-    #data=in_data
     global ad_rdy_ev
+
+    q.put(in_data)
     ad_rdy_ev.set()
     if counter <= 0:
         return (None,pyaudio.paComplete)
