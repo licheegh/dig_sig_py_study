@@ -36,7 +36,7 @@ class Application(tk.Frame):
 fig = plt.figure()
 rt_ax = plt.subplot(212,xlim=(0,SIZE), ylim=(-0.5,0.5))
 fft_ax = plt.subplot(211)
-fft_ax.set_yscale('log')
+#fft_ax.set_yscale('log')
 fft_ax.set_xlim(0,SIZE)
 fft_ax.set_ylim(0.01,100)
 rt_ax.set_title("Real Time")
@@ -96,7 +96,7 @@ def read_data_thread(q,ad_rdy_ev):
             rt_data = np.real(data)
             #rt_data = np.frombuffer(data,np.dtype('<i2'))
             data = data * window
-            fft_temp_data=fftpack.fft(data,overwrite_x=True)
+            fft_temp_data=fftpack.fftshift(fftpack.fft(data,overwrite_x=True))
             fft_data=np.abs(fft_temp_data)[0:fft_temp_data.size]
             #if Recording :
                 #frames.append(data)
@@ -115,7 +115,7 @@ def rtlsdr_thread():
 
     print('Configuring SDR...')
     sdr.rs = 1e6
-    sdr.fc = 89.7e6
+    sdr.fc = 104.3e6
     sdr.gain = 50
     print('  sample rate: %0.6f MHz' % (sdr.rs/1e6))
     print('  center frequency %0.6f MHz' % (sdr.fc/1e6))

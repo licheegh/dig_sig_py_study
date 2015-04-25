@@ -6,7 +6,7 @@ import file_output
 
 
 fcarr	= 1.0
-finput	= 0.1
+finput	= 0.1    
 fs		= 0.1
 fsmod	= 20.0
 N     = 4096
