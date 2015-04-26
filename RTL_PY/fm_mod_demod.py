@@ -31,8 +31,8 @@ audiowindow = signal.hamming(AUDIOSIZE)
 fftwindow = signal.hamming(512)
 
 T=np.arange(0,RFSIZE,1)
-xInput =np.cos(2*np.pi*T*(2/RFSIZE))
-m=10
+xInput =np.cos(2*np.pi*T*(4/RFSIZE))
+m=100
 C=0
 xCa=np.cos(m*xInput+2*np.pi*T*(C/RFSIZE))+1j*np.sin(m*xInput+2*np.pi*T*(C/RFSIZE))
 plt.subplot(4,1,1)
@@ -64,10 +64,17 @@ audiodata=signal.decimate(xCa,DOWN_FACTOR,ftype="fir")
 #fdec_data=np.angle(diff_data)
 #audiodata=np.arctan2(diff_data.imag,diff_data.real)
 #
-angle_data=np.angle(xCa)
-angle_data=np.unwrap(angle_data)
-audiodata=np.diff(angle_data)
+#angle_data=np.angle(xCa)
 
+#angle_data=np.diff(angle_data)
+#audiodata=np.unwrap(angle_data)
+
+#
+pre_data=1
+data=xCa
+data_diff=np.insert(np.diff(data),0,pre_data)
+audiodata=data.real*data_diff.imag-data.imag*data_diff.real
+audiodata=audiodata/(np.power(data.real,2)+np.power(data.imag,2))
 
 
 plt.subplot(4,1,4)
