@@ -6,6 +6,7 @@ Created on Tue Mar 24 10:48:07 2015
 """
 
 import matplotlib.pyplot as plt
+import matplotlib.mlab as mlab
 import numpy as np
 from scipy import fftpack
 from scipy import signal

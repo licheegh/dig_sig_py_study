@@ -19,7 +19,7 @@ RFGAIN = 50
 
 DOWN_FACTOR = 10
 
-RFSIZE = int(512*10)
+RFSIZE = int(512*100)
 AUDIOSIZE = int(RFSIZE/DOWN_FACTOR)
 FORMAT = pyaudio.paInt16
 CHANNELS = 1
@@ -28,19 +28,19 @@ AUDIORATE = int(RFRATE/DOWN_FACTOR)
 tempdata = np.zeros(AUDIOSIZE)
 
 def read_data_thread(rf_q,ad_rdy_ev,audio_q):
+    print("read data thread start")
     pre_data=0
     #filter design
     #FIR_LP = signal.firwin(19,17e3,1e3,window='hamming',True,False,RFRATE/2)
     #FIR_LP = signal.firwin(19,400e3/(RFRATE/2))
     #FIR_LP = signal.firwin(9,10e3/(AUDIORATE/2))
-    FIR_LP = signal.firwin(2,1/(AUDIORATE/2))
-    print(FIR_LP)
     rfwindow = signal.hamming(RFSIZE)
     audiowindow = signal.hamming(AUDIOSIZE)
     fftwindow = signal.hamming(512)
 
-    print("read data thread start")
-    while 1:
+    ad_rdy_ev.wait(timeout=5000)
+    np.save("data",rf_q.get())
+    while 0:
         ad_rdy_ev.wait(timeout=1000)
         while not rf_q.empty():
             #process data here
@@ -50,20 +50,20 @@ def read_data_thread(rf_q,ad_rdy_ev,audio_q):
             #data = signal.lfilter(FIR_LP,1.0,data)
 
             #demod method 1
-            #angle_data=np.angle(data)
-            #audioda=np.diff(angle_data)
-            #audiodata=np.insert(audioda,0,angle_data[0]-pre_data)
-            #pre_data=angle_data[-1]
-            #audiodata=np.unwrap(audiodata,np.pi)
+            angle_data=np.angle(data)
+            audioda=np.diff(angle_data)
+            audiodata=np.insert(audioda,0,angle_data[0]-pre_data)
+            pre_data=angle_data[-1]
+            audiodata=np.unwrap(audiodata,np.pi)
 
 
             #demod method 2
-            data_delay=np.insert(data,0,pre_data)
-            pre_data = data_delay[-1]
-            data_delay=np.delete(data_delay,-1)
-            diff_data=data*np.conj(data_delay)
-            audiodata=np.angle(diff_data)
-            audiodata=np.unwrap(audiodata)
+            #data_delay=np.insert(data,0,pre_data)
+            #pre_data = data_delay[-1]
+            #data_delay=np.delete(data_delay,-1)
+            #diff_data=data*np.conj(data_delay)
+            #audiodata=np.angle(diff_data)
+            #audiodata=np.unwrap(audiodata)
 
 
             #demod method 3
@@ -72,37 +72,27 @@ def read_data_thread(rf_q,ad_rdy_ev,audio_q):
             #pre_data=data[-1]
             #audiodata=data.real*diff_data.imag-data.imag*diff_data.real
             #audiodata=audiodata/(np.power(data.real,2)+np.power(data.imag,2))
+            #audiodata=audiodata*10
 
-            #demod method 4
-            #data = data*10000
-            #diff_data=np.diff(data)
-            #diff_data=np.insert(diff_data,0,data[0]-pre_data)
-            #pre_data=data[-1]
-            #data_real = data.real.astype(np.dtype('i4'))
-            #data_imag= data.imag.astype(np.dtype('i4'))
-            #diff_data_real = diff_data.real.astype(np.dtype('i4'))
-            #diff_data_imag= diff_data.imag.astype(np.dtype('i4'))
-            #audiodata=data_real*diff_data_imag-data_imag*diff_data_real
-            #audiodata=audiodata//(np.power(data_real,2)+np.power(data_imag,2))
-
-            #audiodata=audiodata*1
-
-            #audiodata=signal.decimate(audiodata,DOWN_FACTOR,ftype="fir")
-            audiodata = audiodata[0::10]
+            audiodata=signal.decimate(audiodata,DOWN_FACTOR,ftype="fir")
 
             #audiodata = signal.lfilter(FIR_LP,1.0,audiodata)
-            audiodata = signal.fftconvolve(FIR_LP, audiodata)
 
             audiodata_amp=audiodata*1e4
             snd_data = audiodata_amp.astype(np.dtype('<i2')).tostring()
             audio_q.put(snd_data)
         ad_rdy_ev.clear()
+    print("read data thread ended")
 
 #rtlsdr
-def rtlsdr_callback(samples, context):
-
+a = 1
+def rtlsdr_callback(samples,context):
+    global a
+    a = a+1
     context[1].put(samples)
-    context[0].set()
+    if a>100 :
+        context[0].set()
+        context[2].cancel_read_async()
 
 def rtlsdr_thread(rf_q,ad_rdy_ev):
 
@@ -116,9 +106,9 @@ def rtlsdr_thread(rf_q,ad_rdy_ev):
     print('  sample rate: %0.6f MHz' % (sdr.rs/1e6))
     print('  center frequency %0.6f MHz' % (sdr.fc/1e6))
     print('  gain: %d dB' % sdr.gain)
-    context=[ad_rdy_ev,rf_q]
-    sdr.read_samples_async(rtlsdr_callback, RFSIZE,context)
-    sdr.cancel_read_async()
+    context=[ad_rdy_ev,rf_q,sdr]
+    sdr.read_samples_async(rtlsdr_callback, RFSIZE, context)
+    #sdr.cancel_read_async()
     sdr.close()
     print('read rtlsdr thread ended')
 
